@@ -108,9 +108,15 @@ import java.util.regex.PatternSyntaxException;
  * @since   JDK1.0
  */
 
+/**
+ * @author huangzhiwei
+ */
 public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence {
     /** The value is used for character storage. */
+    /**
+     * String是对char[]的进一步封装，final修饰，代表着value的引用不可变，但是引用中的内容是可以更改的
+     */
     private final char value[];
 
     /** Cache the hash code for the string */
@@ -653,6 +659,11 @@ public final class String
      *             argument is negative or not less than the length of this
      *             string.
      */
+    /**
+     * 判断字符串长度是否为0或位序是否大于等于字符串长度，如果是，就会发生字符数组越界的异常
+     * @param index 位序
+     * @return 返回指定位序的字符
+     */
     public char charAt(int index) {
         if ((index < 0) || (index >= value.length)) {
             throw new StringIndexOutOfBoundsException(index);
@@ -681,6 +692,11 @@ public final class String
      *             argument is negative or not less than the length of this
      *             string.
      * @since      1.5
+     */
+    /**
+     * codePointAt 返回指定位序字符的unicode code
+     * @param index 位序
+     * @return 指定位序上的字符的unicode码
      */
     public int codePointAt(int index) {
         if ((index < 0) || (index >= value.length)) {
@@ -778,6 +794,11 @@ public final class String
     /**
      * Copy characters from this string into dst starting at dstBegin.
      * This method doesn't perform any range checking.
+     */
+    /**
+     * 执行字符数组拷贝，从dst数组的dstBegin位置，将当前字符串拷贝到词，且不执行范围检查，底层调用的是System.arraycopy方法
+     * @param dst
+     * @param dstBegin
      */
     void getChars(char dst[], int dstBegin) {
         System.arraycopy(value, 0, dst, dstBegin, value.length);
@@ -912,6 +933,12 @@ public final class String
      *
      * @since  JDK1.1
      */
+    /**
+     * 获得String对象的字节数组
+     * @param charsetName java支持的字符编码
+     * @return 以charsetName指定的编码，编码字符串返回的字节数组
+     * @throws UnsupportedEncodingException 不是Java支持的编码格式抛出此异常
+     */
     public byte[] getBytes(String charsetName)
             throws UnsupportedEncodingException {
         if (charsetName == null) throw new NullPointerException();
@@ -973,6 +1000,11 @@ public final class String
      * @see  #compareTo(String)
      * @see  #equalsIgnoreCase(String)
      */
+    /**
+     * equals方法用于比较两个字符串对象的值是否相同
+     * @param anObject 比较对象
+     * @return 相同返回true
+     */
     public boolean equals(Object anObject) {
         if (this == anObject) {
             return true;
@@ -1009,6 +1041,11 @@ public final class String
      *          {@code false} otherwise
      *
      * @since  1.4
+     */
+    /**
+     * String对象和StringBuffer对象的内容比较
+     * @param sb
+     * @return 相同返回true
      */
     public boolean contentEquals(StringBuffer sb) {
         return contentEquals((CharSequence)sb);
@@ -1150,6 +1187,11 @@ public final class String
      *          value greater than {@code 0} if this string is
      *          lexicographically greater than the string argument.
      */
+    /**
+     * 按字典序比较字符串
+     * @param anotherString 另一个字符串对象
+     * @return this.charAt(k)-anotherString.charAt(k)，两个字符串比较unicode码，字典序靠前的越小
+     */
     public int compareTo(String anotherString) {
         int len1 = value.length;
         int len2 = anotherString.value.length;
@@ -1166,7 +1208,7 @@ public final class String
             }
             k++;
         }
-        return len1 - len2;
+        return len1 - len2; //两个字符串长度中最小长度内的字符都相同，当前字符串长度大，就返回大于0，小返回小于0
     }
 
     /**
@@ -1399,6 +1441,12 @@ public final class String
      *          this.substring(toffset).startsWith(prefix)
      *          </pre>
      */
+    /**
+     * 判断toffset位序开始的子字符串是否以prefix为前缀
+     * @param prefix 前缀
+     * @param toffset 偏移
+     * @return 是否以前缀开头
+     */
     public boolean startsWith(String prefix, int toffset) {
         char ta[] = value;
         int to = toffset;
@@ -1444,6 +1492,11 @@ public final class String
      *          result will be {@code true} if the argument is the
      *          empty string or is equal to this {@code String} object
      *          as determined by the {@link #equals(Object)} method.
+     */
+    /**
+     * endsWith的实现是startsWith
+     * @param suffix 后缀
+     * @return 从指定的位序判断是否已suffix结尾
      */
     public boolean endsWith(String suffix) {
         return startsWith(suffix, value.length - suffix.value.length);
@@ -1750,6 +1803,7 @@ public final class String
      * @param   targetCount  count of the target string.
      * @param   fromIndex    the index to begin searching from.
      */
+    //TODO 待看
     static int indexOf(char[] source, int sourceOffset, int sourceCount,
             char[] target, int targetOffset, int targetCount,
             int fromIndex) {
