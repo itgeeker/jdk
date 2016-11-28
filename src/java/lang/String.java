@@ -193,6 +193,12 @@ public final class String
      *          If the {@code offset} and {@code count} arguments index
      *          characters outside the bounds of the {@code value} array
      */
+    /**
+     * String的构造函数，底层使用的是Arrays.copyOfRange方法，将一个字符数组从offset开始拷贝，拷贝count个字符
+     * @param value 字符数组
+     * @param offset 偏移量
+     * @param count 长度
+     */
     public String(char value[], int offset, int count) {
         if (offset < 0) {
             throw new StringIndexOutOfBoundsException(offset);
@@ -1188,7 +1194,7 @@ public final class String
      *          lexicographically greater than the string argument.
      */
     /**
-     * 按字典序比较字符串
+     * 按字典序比较字符串，最小长度范围内，比较字符的顺序，如果都相同，则比较字符串的长度。
      * @param anotherString 另一个字符串对象
      * @return this.charAt(k)-anotherString.charAt(k)，两个字符串比较unicode码，字典序靠前的越小
      */
@@ -1225,6 +1231,10 @@ public final class String
      */
     public static final Comparator<String> CASE_INSENSITIVE_ORDER
                                          = new CaseInsensitiveComparator();
+
+    /**
+     * 大小写不敏感的比较器
+     */
     private static class CaseInsensitiveComparator
             implements Comparator<String>, java.io.Serializable {
         // use serialVersionUID from JDK 1.2.2 for interoperability
@@ -1698,12 +1708,18 @@ public final class String
      *          than or equal to {@code fromIndex}, or {@code -1}
      *          if the character does not occur before that point.
      */
+    /**
+     * 从后往前查询指定字符在字符串的位序
+     * @param ch
+     * @param fromIndex
+     * @return
+     */
     public int lastIndexOf(int ch, int fromIndex) {
         if (ch < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
             // handle most cases here (ch is a BMP code point or a
             // negative value (invalid code point))
             final char[] value = this.value;
-            int i = Math.min(fromIndex, value.length - 1);
+            int i = Math.min(fromIndex, value.length - 1); //fromIndex 查询字符的起始位序 value.length-1 最大位序
             for (; i >= 0; i--) {
                 if (value[i] == ch) {
                     return i;
@@ -1767,6 +1783,12 @@ public final class String
      *          starting at the specified index,
      *          or {@code -1} if there is no such occurrence.
      */
+    /**
+     *
+     * @param str
+     * @param fromIndex
+     * @return
+     */
     public int indexOf(String str, int fromIndex) {
         return indexOf(value, 0, value.length,
                 str.value, 0, str.value.length, fromIndex);
@@ -1803,7 +1825,6 @@ public final class String
      * @param   targetCount  count of the target string.
      * @param   fromIndex    the index to begin searching from.
      */
-    //TODO 待看
     static int indexOf(char[] source, int sourceOffset, int sourceCount,
             char[] target, int targetOffset, int targetCount,
             int fromIndex) {
@@ -1976,6 +1997,11 @@ public final class String
      *             {@code beginIndex} is negative or larger than the
      *             length of this {@code String} object.
      */
+    /**
+     * 子字符串
+     * @param beginIndex 开始位序，包括当前位序
+     * @return
+     */
     public String substring(int beginIndex) {
         if (beginIndex < 0) {
             throw new StringIndexOutOfBoundsException(beginIndex);
@@ -2020,6 +2046,10 @@ public final class String
         if (subLen < 0) {
             throw new StringIndexOutOfBoundsException(subLen);
         }
+        /**
+         * 截取子串的方法使用的构造函数是String(char[] value,int offset,int count)
+         * beginIndex是offset，count是endIndex-beginIndex
+         */
         return ((beginIndex == 0) && (endIndex == value.length)) ? this
                 : new String(value, beginIndex, subLen);
     }
@@ -2083,7 +2113,9 @@ public final class String
             return this;
         }
         int len = value.length;
+        /** 字符数组拷贝，传递原数组和新数组的长度，创建一个新数组，把原数组的内容拷贝进去*/
         char buf[] = Arrays.copyOf(value, len + otherLen);
+        /** str.getChars调用System.arraycopy(),将str的字符数组，从0开始到length,都拷贝到字符数组buf的后面，就实现了连接，底层调用System.arrayCopy */
         str.getChars(buf, len);
         return new String(buf, true);
     }
@@ -2117,18 +2149,24 @@ public final class String
      * @return  a string derived from this string by replacing every
      *          occurrence of {@code oldChar} with {@code newChar}.
      */
+    /**
+     * 替换字符
+     * @param oldChar 老字符
+     * @param newChar 新字符
+     * @return
+     */
     public String replace(char oldChar, char newChar) {
         if (oldChar != newChar) {
             int len = value.length;
             int i = -1;
             char[] val = value; /* avoid getfield opcode */
 
-            while (++i < len) {
+            while (++i < len) {     /* 先找到第一次出现oldChar的位置，这样可以提高字符串中没有oldChar的情况的速度*/
                 if (val[i] == oldChar) {
                     break;
                 }
             }
-            if (i < len) {
+            if (i < len) {      /* 有oldChar*/
                 char buf[] = new char[len];
                 for (int j = 0; j < i; j++) {
                     buf[j] = val[j];
@@ -2665,8 +2703,8 @@ public final class String
                 srcCount = 1;
             }
             if (localeDependent ||
-                srcChar == '\u03A3' || // GREEK CAPITAL LETTER SIGMA
-                srcChar == '\u0130') { // LATIN CAPITAL LETTER I WITH DOT ABOVE
+                    srcChar == '\u03A3' || // GREEK CAPITAL LETTER SIGMA
+                    srcChar == '\u0130') { // LATIN CAPITAL LETTER I WITH DOT ABOVE
                 lowerChar = ConditionalSpecialCasing.toLowerCaseEx(this, i, locale);
             } else {
                 lowerChar = Character.toLowerCase(srcChar);
@@ -2918,18 +2956,22 @@ public final class String
      *          space removed, or this string if it has no leading or
      *          trailing white space.
      */
+    /**
+     * 去掉字符串前后的空字符
+     * @return
+     */
     public String trim() {
         int len = value.length;
         int st = 0;
         char[] val = value;    /* avoid getfield opcode */
 
-        while ((st < len) && (val[st] <= ' ')) {
+        while ((st < len) && (val[st] <= ' ')) {    /*去掉头部asc码小于' '的码值*/
             st++;
         }
-        while ((st < len) && (val[len - 1] <= ' ')) {
+        while ((st < len) && (val[len - 1] <= ' ')) { /*去掉尾部asc码小于' '的码值*/
             len--;
         }
-        return ((st > 0) || (len < value.length)) ? substring(st, len) : this;
+        return ((st > 0) || (len < value.length)) ? substring(st, len) : this;  /*头部或尾部有空格，取子串，否则返回原串*/
     }
 
     /**
