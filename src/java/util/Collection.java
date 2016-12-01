@@ -141,6 +141,10 @@ import java.util.stream.StreamSupport;
  * @since 1.2
  */
 
+/**
+ * Collection接口继承了Iterable接口,是List，Set和Queue的父接口
+ * @param <E>
+ */
 public interface Collection<E> extends Iterable<E> {
     // Query Operations
 
@@ -151,12 +155,18 @@ public interface Collection<E> extends Iterable<E> {
      *
      * @return the number of elements in this collection
      */
+    /**
+     * 返回集合中元素的个数，如果集合中的个数超过了Integer.MAX_VALUE,返回Integer.MAX_VALUE
+     * @return 集合中元素的个数
+     */
     int size();
 
     /**
      * Returns <tt>true</tt> if this collection contains no elements.
-     *
-     * @return <tt>true</tt> if this collection contains no elements
+     */
+    /**
+     * 判断集合是否为空
+     * @return 为空返回true
      */
     boolean isEmpty();
 
@@ -176,6 +186,11 @@ public interface Collection<E> extends Iterable<E> {
      *         collection does not permit null elements
      *         (<a href="#optional-restrictions">optional</a>)
      */
+    /**
+     * 判断集合是否包含对象o
+     * @param o 对象o
+     * @return
+     */
     boolean contains(Object o);
 
     /**
@@ -185,6 +200,10 @@ public interface Collection<E> extends Iterable<E> {
      * guarantee).
      *
      * @return an <tt>Iterator</tt> over the elements in this collection
+     */
+    /**
+     * 返回collection元素的迭代器
+     * @return 集合迭代器，元素无序
      */
     Iterator<E> iterator();
 
@@ -203,6 +222,10 @@ public interface Collection<E> extends Iterable<E> {
      * APIs.
      *
      * @return an array containing all of the elements in this collection
+     */
+    /**
+     * 返回一个包含collection中所有元素的数组
+     * @return
      */
     Object[] toArray();
 
@@ -249,6 +272,12 @@ public interface Collection<E> extends Iterable<E> {
      *         this collection
      * @throws NullPointerException if the specified array is null
      */
+    /**
+     * toArray 转换成数组
+     * @param a
+     * @param <T>
+     * @return
+     */
     <T> T[] toArray(T[] a);
 
     // Modification Operations
@@ -286,6 +315,11 @@ public interface Collection<E> extends Iterable<E> {
      * @throws IllegalStateException if the element cannot be added at this
      *         time due to insertion restrictions
      */
+    /**
+     * 向集合中添加元素，添加成功返回true,集合中包含该元素并且集合不允许重复，添加失败返回false
+     * @param e
+     * @return
+     */
     boolean add(E e);
 
     /**
@@ -307,6 +341,11 @@ public interface Collection<E> extends Iterable<E> {
      *         (<a href="#optional-restrictions">optional</a>)
      * @throws UnsupportedOperationException if the <tt>remove</tt> operation
      *         is not supported by this collection
+     */
+    /**
+     * 删除指定元素
+     * @param o
+     * @return
      */
     boolean remove(Object o);
 
@@ -330,6 +369,11 @@ public interface Collection<E> extends Iterable<E> {
      *         (<a href="#optional-restrictions">optional</a>),
      *         or if the specified collection is null.
      * @see    #contains(Object)
+     */
+    /**
+     * 一个集合中包含另一个集合中的所有元素
+     * @param c
+     * @return
      */
     boolean containsAll(Collection<?> c);
 
@@ -357,6 +401,11 @@ public interface Collection<E> extends Iterable<E> {
      *         this time due to insertion restrictions
      * @see #add(Object)
      */
+    /**
+     * 向集合中添加另一个集合的所有元素
+     * @param c
+     * @return
+     */
     boolean addAll(Collection<? extends E> c);
 
     /**
@@ -381,6 +430,11 @@ public interface Collection<E> extends Iterable<E> {
      *         or if the specified collection is null
      * @see #remove(Object)
      * @see #contains(Object)
+     */
+    /**
+     * 移除collection集合中的所有元素
+     * @param c
+     * @return
      */
     boolean removeAll(Collection<?> c);
 
@@ -441,6 +495,11 @@ public interface Collection<E> extends Iterable<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
+    /**
+     * 返回当前集合中与c集合的交集
+     * @param c
+     * @return
+     */
     boolean retainAll(Collection<?> c);
 
     /**
@@ -449,6 +508,9 @@ public interface Collection<E> extends Iterable<E> {
      *
      * @throws UnsupportedOperationException if the <tt>clear</tt> operation
      *         is not supported by this collection
+     */
+    /**
+     * 清空集合中的元素
      */
     void clear();
 
@@ -487,6 +549,11 @@ public interface Collection<E> extends Iterable<E> {
      * @see Object#equals(Object)
      * @see Set#equals(Object)
      * @see List#equals(Object)
+     */
+    /**
+     * 等于
+     * @param o
+     * @return
      */
     boolean equals(Object o);
 
