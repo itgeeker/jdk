@@ -136,12 +136,20 @@ public interface Map<K,V> {
      *
      * @return the number of key-value mappings in this map
      */
+    /**
+     * map的键值对数量
+     * @return 键值对数量
+     */
     int size();
 
     /**
      * Returns <tt>true</tt> if this map contains no key-value mappings.
      *
      * @return <tt>true</tt> if this map contains no key-value mappings
+     */
+    /**
+     * 是否为空
+     * @return
      */
     boolean isEmpty();
 
@@ -162,6 +170,11 @@ public interface Map<K,V> {
      *         does not permit null keys
      * (<a href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
      */
+    /**
+     * 是否包含指定的键
+     * @param key
+     * @return
+     */
     boolean containsKey(Object key);
 
     /**
@@ -181,6 +194,11 @@ public interface Map<K,V> {
      * @throws NullPointerException if the specified value is null and this
      *         map does not permit null values
      * (<a href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
+     */
+    /**
+     * 包含指定的值返回true
+     * @param value
+     * @return
      */
     boolean containsValue(Object value);
 
@@ -209,6 +227,11 @@ public interface Map<K,V> {
      *         does not permit null keys
      * (<a href="{@docRoot}/java/util/Collection.html#optional-restrictions">optional</a>)
      */
+    /**
+     * 返回指定key的value
+     * @param key
+     * @return
+     */
     V get(Object key);
 
     // Modification Operations
@@ -236,6 +259,12 @@ public interface Map<K,V> {
      *         and this map does not permit null keys or values
      * @throws IllegalArgumentException if some property of the specified key
      *         or value prevents it from being stored in this map
+     */
+    /**
+     * 向map中放入指定的键值对
+     * @param key
+     * @param value
+     * @return
      */
     V put(K key, V value);
 
@@ -322,6 +351,10 @@ public interface Map<K,V> {
      *
      * @return a set view of the keys contained in this map
      */
+    /**
+     * 返回一个map的key的Set集合，获取Set集合的迭代器，通过map.get(k)的方法获取value
+     * @return
+     */
     Set<K> keySet();
 
     /**
@@ -338,6 +371,10 @@ public interface Map<K,V> {
      * support the <tt>add</tt> or <tt>addAll</tt> operations.
      *
      * @return a collection view of the values contained in this map
+     */
+    /**
+     *  返回map中所有值的一个视图
+     * @return
      */
     Collection<V> values();
 
@@ -357,6 +394,10 @@ public interface Map<K,V> {
      *
      * @return a set view of the mappings contained in this map
      */
+    /**
+     * map.entrySet()返回一个map集合的映射关系(Map.Entry<K,V>)的set
+     * @return
+     */
     Set<Map.Entry<K, V>> entrySet();
 
     /**
@@ -372,6 +413,11 @@ public interface Map<K,V> {
      * @see Map#entrySet()
      * @since 1.2
      */
+    /**
+     * 键值对接口Entry<K,V>
+     * @param <K> 键
+     * @param <V> 值
+     */
     interface Entry<K,V> {
         /**
          * Returns the key corresponding to this entry.
@@ -380,6 +426,10 @@ public interface Map<K,V> {
          * @throws IllegalStateException implementations may, but are not
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
+         */
+        /**
+         * 从键值对接口Map.Entry中的getKey()方法可以获取到键值对中的键
+         * @return
          */
         K getKey();
 
@@ -392,6 +442,10 @@ public interface Map<K,V> {
          * @throws IllegalStateException implementations may, but are not
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
+         */
+        /**
+         * 从键值对内部接口Map.Entry接口中getValue()方法中获得键值对的值
+         * @return
          */
         V getValue();
 
@@ -414,6 +468,11 @@ public interface Map<K,V> {
          * @throws IllegalStateException implementations may, but are not
          *         required to, throw this exception if the entry has been
          *         removed from the backing map.
+         */
+        /**
+         * Map.Entry entry.setValue(value),可以修改指定指定键值对的value
+         * @param value
+         * @return
          */
         V setValue(V value);
 

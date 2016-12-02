@@ -3177,6 +3177,7 @@ public class Arrays {
      * @since 1.6
      */
     @SuppressWarnings("unchecked")
+    //Arrays.copyOf有多个重载方法，实现思路都一样，泛型版本的源码，将原数组拷贝到一个新数组中，长度为newLength
     public static <T> T[] copyOf(T[] original, int newLength) {
         return (T[]) copyOf(original, newLength, original.getClass());
     }
@@ -3205,6 +3206,7 @@ public class Arrays {
      *     an array of class <tt>newType</tt>
      * @since 1.6
      */
+    //判断要转换的数据的类型，然后实例化newLength长度的数组，最后调用System.arraycopy执行数组拷贝
     public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) {
         @SuppressWarnings("unchecked")
         T[] copy = ((Object)newType == (Object)Object[].class)
