@@ -80,6 +80,7 @@ import java.util.function.Consumer;
  * @param <E> the type of elements held in this collection
  */
 //LinkedList的底层实现是链表，继承AbstractList,实现List,Cloneable,Serializable接口
+//LinkedList的底层实现双向链表，顺序访问非常高效，随机访问效率低
 public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable {
