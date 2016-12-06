@@ -695,7 +695,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             if (p.hash == hash &&
                 ((k = p.key) == key || (key != null && key.equals(k))))
                 e = p;      //找到相同的key值
-            else if (p instanceof TreeNode)
+            else if (p instanceof TreeNode) //TreeMap的节点
                 e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
             else { //不存在key值对应的映射
                 for (int binCount = 0; ; ++binCount) {
@@ -711,10 +711,14 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                     p = e;
                 }
             }
+
             if (e != null) { // existing mapping for key 现存对key值的映射
                 V oldValue = e.value;
                 if (!onlyIfAbsent || oldValue == null)  //不缺失或者oldValue为null
                     e.value = value; //设置值
+                /**
+                 * LinkedHashMap在修改节点值后，依据访问顺序设置，做访问后操作
+                 */
                 afterNodeAccess(e);
                 return oldValue;
             }
@@ -1823,6 +1827,14 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * classes, and HashSet.
      */
 
+    /**
+     * 下面的方法访问权限是包级别的，用来给LinkedHashMap覆写的，而不是给其他的子类覆写
+     * @param hash
+     * @param key
+     * @param value
+     * @param next
+     * @return
+     */
     // Create a regular (non-tree) node
     Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
         return new Node<>(hash, key, value, next);

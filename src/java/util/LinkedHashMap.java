@@ -160,11 +160,22 @@ import java.io.IOException;
  * @see     Hashtable
  * @since   1.4
  */
+
+/**
+ * LinkedHashMap实际上是HashMap和LinkedList两个集合类的存储结构的结合。在LinkedHashMap中
+ * 所有put进来的Entry都保存到如哈希表中，但它又额外定义了一个以head为头结点的双向循环列表，每
+ * 次put进来的Entry，除了保存到哈希表中对应的位置，还要将其插入到双向循环链表的尾部。
+ * @param <K>
+ * @param <V>
+ */
 public class LinkedHashMap<K,V>
     extends HashMap<K,V>
     implements Map<K,V>
 {
 
+    /**
+     * LinkedHashMap并没有覆写HashMap中的put方法，而是覆盖了put方法中的addEntry()方法和recordAccess方法
+     */
     /*
      * Implementation note.  A previous version of this class was
      * internally structured a little differently. Because superclass
@@ -189,8 +200,13 @@ public class LinkedHashMap<K,V>
     /**
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
+    /**
+     * LinkedHashMap的Entry是HashMap的Node的子类，添加了前置和后置指针
+     * @param <K>
+     * @param <V>
+     */
     static class Entry<K,V> extends HashMap.Node<K,V> {
-        Entry<K,V> before, after;
+        Entry<K,V> before, after;   //双向循环链表的前置和后置指针
         Entry(int hash, K key, V value, Node<K,V> next) {
             super(hash, key, value, next);
         }
@@ -201,17 +217,20 @@ public class LinkedHashMap<K,V>
     /**
      * The head (eldest) of the doubly linked list.
      */
+    //双向循环链表的头指针
     transient LinkedHashMap.Entry<K,V> head;
 
     /**
      * The tail (youngest) of the doubly linked list.
      */
+    //双向循环链表的尾指针
     transient LinkedHashMap.Entry<K,V> tail;
 
     /**
      * The iteration ordering method for this linked hash map: <tt>true</tt>
      * for access-order, <tt>false</tt> for insertion-order.
-     *
+     * accessOrder 为true的时候表示双向链表的元素以访问的先后顺序迭代，为false时代表以从插入顺序排序
+     * 这样Entry的输出顺序和插入顺序一致，但put和get方法均有调用recordAccess方法
      * @serial
      */
     final boolean accessOrder;
@@ -294,6 +313,10 @@ public class LinkedHashMap<K,V>
             a.before = b;
     }
 
+    /**
+     * LRU算法的实现 节点
+     * @param evict
+     */
     void afterNodeInsertion(boolean evict) { // possibly remove eldest
         LinkedHashMap.Entry<K,V> first;
         if (evict && (first = head) != null && removeEldestEntry(first)) {
@@ -302,24 +325,40 @@ public class LinkedHashMap<K,V>
         }
     }
 
+    /**
+     * 最后说说LinkedHashMap是如何实现LRU的。首先，当accessOrder为true时，
+     * 才会开启按访问顺序排序的模式，才能用来实现LRU算法。我们可以看到，无论是
+     * put方法还是get方法，都会导致目标Entry成为最近访问的Entry，因此便把该
+     * Entry加入到了双向链表的末尾（get方法通过调用recordAccess方法来实现，
+     * put方法在覆盖已有key的情况下，也是通过调用recordAccess方法来实现，
+     * 在插入新的Entry时，则是通过createEntry中的addBefore方法来实现），
+     * 这样便把最近使用了的Entry放入到了双向链表的后面，多次操作后，双向
+     * 链表前面的Entry便是最近没有使用的，这样当节点个数满的时候，删除的
+     * 最前面的Entry(head后面的那个Entry)便是最近最少使用的Entry。
+     */
+    /**
+     * LinkedHashMap中的accessOrder为true时，代表访问顺序，标识节点被访问后要移东该节点到双向循环链表中的末尾
+     * @param e 被访问的节点
+     */
     void afterNodeAccess(Node<K,V> e) { // move node to last
         LinkedHashMap.Entry<K,V> last;
-        if (accessOrder && (last = tail) != e) {
+        if (accessOrder && (last = tail) != e) { //以访问顺序排序，且当前节点不是尾节点
             LinkedHashMap.Entry<K,V> p =
-                (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
-            p.after = null;
-            if (b == null)
-                head = a;
-            else
-                b.after = a;
-            if (a != null)
-                a.before = b;
-            else
-                last = b;
-            if (last == null)
-                head = p;
-            else {
-                p.before = last;
+                (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after; //p=当前节点,b是前一个节点，a是后一个节点
+            p.after = null; //分离当前节点
+            if (b == null)  //前一个节点为空
+                head = a;   //头结点就变成a
+            else            //前一个节点不为空
+                b.after = a;    //前一个节点的after指针指向a
+            if (a != null)  //后一个节点不为null
+                a.before = b;   //后一个节点的前置指针为b
+            else            //后一个节点为null
+                last = b;   //尾指针就只想前一个节点
+            if (last == null)   //尾指针为空
+                head = p;   //p就是头结点
+            else {  //尾指针不为空
+                p.before = last;    //p的前置指针是尾指针，后置指针是头指针
+                p.before = last;    //p的前置指针是尾指针，后置指针是头指针
                 last.after = p;
             }
             tail = p;
@@ -343,6 +382,11 @@ public class LinkedHashMap<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
      */
+    /**
+     * 以指定初始化容量，负载因子和插入顺序构造一个空的LinkedHashMap实例
+     * @param initialCapacity 初始化容量
+     * @param loadFactor    负载因子
+     */
     public LinkedHashMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
         accessOrder = false;
@@ -355,6 +399,10 @@ public class LinkedHashMap<K,V>
      * @param  initialCapacity the initial capacity
      * @throws IllegalArgumentException if the initial capacity is negative
      */
+    /**
+     * 以指定初始化容量和插入顺序构造一个空的LinkedHashMap实例
+     * @param initialCapacity 初始化容量
+     */
     public LinkedHashMap(int initialCapacity) {
         super(initialCapacity);
         accessOrder = false;
@@ -363,6 +411,9 @@ public class LinkedHashMap<K,V>
     /**
      * Constructs an empty insertion-ordered <tt>LinkedHashMap</tt> instance
      * with the default initial capacity (16) and load factor (0.75).
+     */
+    /**
+     * 无参构造函数(以默认初始化容量(16)，默认负载因子(0.75)和插入顺序构造一个空的LinkedHashMap实例)
      */
     public LinkedHashMap() {
         super();
@@ -377,6 +428,9 @@ public class LinkedHashMap<K,V>
      *
      * @param  m the map whose mappings are to be placed in this map
      * @throws NullPointerException if the specified map is null
+     */
+    /**
+     * 以指定Map的集合和插入顺序构造一个空的LinkedHashMap实例
      */
     public LinkedHashMap(Map<? extends K, ? extends V> m) {
         super();
@@ -394,6 +448,14 @@ public class LinkedHashMap<K,V>
      *         access-order, <tt>false</tt> for insertion-order
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
+     */
+    /**
+     * 以指定初始化容量，负载因子和访问顺序构造一个空的LinkedHashMap实例
+     * @param initialCapacity 初始化容量
+     * @param loadFactor    负载因子
+     * @param accessOrder   访问顺序
+     *
+     * 如果想用LinkedHashMap实现LRU算法，按照访问顺序排序，可以将用户最近访问的移动到链表的末尾
      */
     public LinkedHashMap(int initialCapacity,
                          float loadFactor,
@@ -435,17 +497,28 @@ public class LinkedHashMap<K,V>
      * The {@link #containsKey containsKey} operation may be used to
      * distinguish these two cases.
      */
+    /**
+     * get方法实现
+     * @param key 指定key
+     * @return
+     */
     public V get(Object key) {
         Node<K,V> e;
-        if ((e = getNode(hash(key), key)) == null)
+        if ((e = getNode(hash(key), key)) == null) //节点为null
             return null;
-        if (accessOrder)
-            afterNodeAccess(e);
+        if (accessOrder)    //节点不为null，true为访问顺序，false为插入顺序
+            afterNodeAccess(e); //访问顺序，要将当前被访问的Entry移到双向循环链表的末尾
         return e.value;
     }
 
     /**
      * {@inheritDoc}
+     */
+    /**
+     * 按照指定key来获取，存在返回节点值，不存在返回默认值
+     * @param key
+     * @param defaultValue
+     * @return
      */
     public V getOrDefault(Object key, V defaultValue) {
        Node<K,V> e;
@@ -532,7 +605,11 @@ public class LinkedHashMap<K,V>
         return (ks = keySet) == null ? (keySet = new LinkedKeySet()) : ks;
     }
 
+    /**
+     * 链表key值的Set
+     */
     final class LinkedKeySet extends AbstractSet<K> {
+        //Set的大小
         public final int size()                 { return size; }
         public final void clear()               { LinkedHashMap.this.clear(); }
         public final Iterator<K> iterator() {
