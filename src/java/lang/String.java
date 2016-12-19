@@ -3260,5 +3260,11 @@ public final class String
      * @return  a string that has the same contents as this string, but is
      *          guaranteed to be from a pool of unique strings.
      */
-    public native String intern();
+    /**
+     * feature02所做的修改
+     * @return
+     */
+    public native String intern2();
+
+    public String feature2();
 }
