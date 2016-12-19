@@ -1525,12 +1525,16 @@ public final class String
      *
      * @return  a hash code value for this object.
      */
+    /**
+     * String对象的hashcode
+     * @return
+     */
     public int hashCode() {
         int h = hash;
-        if (h == 0 && value.length > 0) {
+        if (h == 0 && value.length > 0) {//字符串是字符数组的实现类
             char val[] = value;
 
-            for (int i = 0; i < value.length; i++) {
+            for (int i = 0; i < value.length; i++) {//遍历字符数组，使用公式s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1],s[*]为字符数组的一个字符的ascii码
                 h = 31 * h + val[i];
             }
             hash = h;
@@ -3260,5 +3264,18 @@ public final class String
      * @return  a string that has the same contents as this string, but is
      *          guaranteed to be from a pool of unique strings.
      */
-    public native String intern();
+    /**
+     * 返回字符串对象的规范标识
+     *
+     * 字符串常量池，虚拟机方法区中的一部分，是所有线程共享的内存区域，是由String类维护
+     *
+     * @return
+     */
+    public native String intern1();
+
+    /**
+     * feature-01分支所做的修改
+     * @return
+     */
+    public String feature01();
 }
