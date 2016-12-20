@@ -3271,11 +3271,5 @@ public final class String
      *
      * @return
      */
-    public native String intern1();
-
-    /**
-     * feature-01分支所做的修改
-     * @return
-     */
-    public String feature01();
+    public native String intern();
 }
