@@ -22,6 +22,9 @@
  *
  *
  */
+/**
+ * 类加载器
+ */
 package java.lang;
 
 import java.io.InputStream;
@@ -182,7 +185,7 @@ public abstract class ClassLoader {
         registerNatives();
     }
 
-    // The parent class loader for delegation
+    // The parent class loader for delegation   委托的父类加载器
     // Note: VM hardcoded the offset of this field, thus all new fields
     // must be added *after* it.
     private final ClassLoader parent;
@@ -398,19 +401,26 @@ public abstract class ClassLoader {
      * @throws  ClassNotFoundException
      *          If the class could not be found
      */
+    /**
+     * 类加载器的双亲委派机制
+     * @param name
+     * @param resolve
+     * @return
+     * @throws ClassNotFoundException
+     */
     protected Class<?> loadClass(String name, boolean resolve)
         throws ClassNotFoundException
     {
         synchronized (getClassLoadingLock(name)) {
-            // First, check if the class has already been loaded
+            // First, check if the class has already been loaded 首先检查类是否已经被加载过
             Class<?> c = findLoadedClass(name);
-            if (c == null) {
+            if (c == null) { //未加载
                 long t0 = System.nanoTime();
                 try {
                     if (parent != null) {
-                        c = parent.loadClass(name, false);
+                        c = parent.loadClass(name, false);  //用父类加载器加载，递归向上，如果父的类加载器都没有加载，则找到顶级父类加载器bootstrap
                     } else {
-                        c = findBootstrapClassOrNull(name);
+                        c = findBootstrapClassOrNull(name); //找到顶级父类加载器加载，找到就返回字节码对象，没找到就返回null
                     }
                 } catch (ClassNotFoundException e) {
                     // ClassNotFoundException thrown if class not found
@@ -418,6 +428,7 @@ public abstract class ClassLoader {
                 }
 
                 if (c == null) {
+                    //从顶级父类加载器开始向下加载，如果没有找到，则依照顺序去查找类
                     // If still not found, then invoke findClass in order
                     // to find the class.
                     long t1 = System.nanoTime();
@@ -1004,6 +1015,7 @@ public abstract class ClassLoader {
     /**
      * Returns a class loaded by the bootstrap class loader;
      * or return null if not found.
+     * 返回一个由bootstrap类加载器加载的类，如果没找到则返回null
      */
     private Class<?> findBootstrapClassOrNull(String name)
     {
@@ -1081,6 +1093,11 @@ public abstract class ClassLoader {
      *          doesn't have adequate  privileges to get the resource.
      *
      * @since  1.1
+     */
+    /**
+     * 通过资源名获取父加载器中的资源路径，如果为空，会调用findResource查找
+     * @param name
+     * @return
      */
     public URL getResource(String name) {
         URL url;
